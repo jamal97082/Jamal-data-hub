@@ -14,47 +14,100 @@
     padding: 24px;
     overflow-x: hidden;
   }
+  
   canvas#matrix {
-    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
   }
+  
   .container { max-width: 1100px; margin: 0 auto; position: relative; z-index: 1; }
+
   #lockScreen {
-    position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85);
-    display: flex; align-items: center; justify-content: center; z-index: 9999;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
   }
   .lock-card {
-    background: rgba(0, 20, 0, 0.8); border: 2px solid #0f0; box-shadow: 0 0 15px #0f0;
-    border-radius: 8px; padding: 36px 30px; width: 100%; max-width: 360px; text-align: center;
+    background: rgba(0, 20, 0, 0.8);
+    border: 2px solid #0f0;
+    box-shadow: 0 0 15px #0f0;
+    border-radius: 8px;
+    padding: 36px 30px;
+    width: 100%;
+    max-width: 360px;
+    text-align: center;
   }
-  .lock-card h2 { font-size: 1.5rem; color: #0f0; text-shadow: 0 0 5px #0f0; margin-bottom: 8px; }
+  .lock-card h2 {
+    font-size: 1.5rem;
+    color: #0f0;
+    text-shadow: 0 0 5px #0f0;
+    margin-bottom: 8px;
+  }
   .lock-card p { color: #0a0; font-size: 0.9rem; margin-bottom: 20px; }
   .lock-card input {
-    width: 100%; padding: 12px 14px; background: #000; border: 1px solid #0f0;
-    color: #0f0; font-size: 1rem; outline: none; margin-bottom: 12px; text-align: center;
-    letter-spacing: 2px; font-family: 'Courier New', Courier, monospace;
+    width: 100%;
+    padding: 12px 14px;
+    background: #000;
+    border: 1px solid #0f0;
+    color: #0f0;
+    font-size: 1rem;
+    outline: none;
+    margin-bottom: 12px;
+    text-align: center;
+    letter-spacing: 2px;
+    font-family: 'Courier New', Courier, monospace;
   }
+  .lock-card input:focus { box-shadow: 0 0 10px #0f0; }
   .lock-card button {
-    width: 100%; padding: 12px; background: #0f0; color: #000; font-weight: 900;
-    border: none; font-size: 1rem; cursor: pointer; font-family: 'Courier New', Courier, monospace;
+    width: 100%;
+    padding: 12px;
+    background: #0f0;
+    color: #000;
+    font-weight: 900;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+    font-family: 'Courier New', Courier, monospace;
+    transition: 0.2s;
   }
   .lock-card button:hover { background: #000; color: #0f0; border: 1px solid #0f0; box-shadow: 0 0 10px #0f0; }
-  #lockError { color: #f00; font-size: 0.85rem; margin-top: 10px; min-height: 16px; }
+  #lockError { color: #f00; font-size: 0.85rem; margin-top: 10px; min-height: 16px; text-shadow: 0 0 5px #f00; }
 
   #mainContent { display: none; }
   header { text-align: center; padding: 40px 0 30px; border-bottom: 1px dashed #0f0; }
   header h1 { font-size: 2.5rem; color: #0f0; text-shadow: 0 0 10px #0f0; margin-bottom: 10px; }
+  header p { color: #0a0; font-size: 1rem; }
   .badge {
-    display: inline-block; margin-top: 14px; padding: 6px 14px;
-    background: rgba(0,255,0,0.1); border: 1px solid #0f0; border-radius: 4px; font-size: 0.85rem; color: #0f0;
+    display: inline-block;
+    margin-top: 14px;
+    padding: 6px 14px;
+    background: rgba(0,255,0,0.1);
+    border: 1px solid #0f0;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    color: #0f0;
   }
   .badge a { color: #0f0; text-decoration: underline; }
 
-  h2.section-title { margin: 40px 0 18px; font-size: 1.3rem; color: #0f0; border-left: 3px solid #0f0; padding-left: 10px; }
+  h2.section-title { margin: 40px 0 18px; font-size: 1.3rem; color: #0f0; border-left: 3px solid #0f0; padding-left: 10px; text-shadow: 0 0 5px #0f0; }
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 18px; }
   .card, .plan, .key-box, .result-block {
-    background: rgba(0, 20, 0, 0.85); border: 1px solid #0f0; border-radius: 4px; padding: 22px;
+    background: rgba(0, 20, 0, 0.85);
+    border: 1px solid #0f0;
+    border-radius: 4px;
+    padding: 22px;
+    transition: transform .15s ease, box-shadow .15s ease;
   }
-  .card h3, .plan h4, .key-box h3 { font-size: 1.1rem; color: #0f0; margin-bottom: 8px; }
+  .card:hover, .plan:hover { transform: translateY(-3px); box-shadow: 0 0 15px #0f0; }
+  .card h3, .plan h4, .key-box h3 { font-size: 1.1rem; color: #0f0; margin-bottom: 8px; text-shadow: 0 0 5px #0f0; }
   .card p, .plan ul, .key-box p { font-size: 0.9rem; color: #0a0; line-height: 1.5; margin-bottom: 14px; }
   .endpoint {
     background: #000; border: 1px solid #0f0; border-radius: 4px; padding: 10px 12px;
@@ -65,14 +118,14 @@
   .btn {
     display: inline-block; padding: 9px 16px; background: #0f0; color: #000; font-weight: bold;
     border-radius: 4px; text-decoration: none; font-size: 0.85rem; border: 1px solid #0f0; cursor: pointer;
-    font-family: 'Courier New', Courier, monospace;
+    font-family: 'Courier New', Courier, monospace; transition: 0.2s;
   }
   .btn:hover { background: #000; color: #0f0; box-shadow: 0 0 10px #0f0; }
   .btn-sm { padding: 7px 12px; font-size: 0.78rem; }
 
   .plans { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
   .plan { text-align: center; }
-  .plan .price { font-size: 1.6rem; color: #0f0; margin: 10px 0; font-weight: 700; }
+  .plan .price { font-size: 1.6rem; color: #0f0; margin: 10px 0; font-weight: 700; text-shadow: 0 0 8px #0f0; }
   .plan ul { list-style: none; }
 
   .key-row { display: flex; gap: 10px; flex-wrap: wrap; }
@@ -80,16 +133,20 @@
     flex: 1; min-width: 180px; padding: 11px 14px; background: #000; border: 1px solid #0f0;
     color: #0f0; font-size: 0.9rem; outline: none; font-family: 'Courier New', Courier, monospace;
   }
+  .key-row input:focus, .key-row select:focus { box-shadow: 0 0 8px #0f0; }
 
   .result-block { margin-top: 20px; display: none; }
   .result-block label { display: block; font-size: 0.85rem; color: #0a0; margin-bottom: 6px; text-transform: uppercase; }
   .result-row { display: flex; gap: 8px; align-items: center; margin-bottom: 14px; }
   .result-row:last-child { margin-bottom: 0; }
   .result-value {
-    flex: 1; font-size: 0.85rem; color: #0f0; word-break: break-all; background: #000; border: 1px dashed #0f0; padding: 9px 12px;
+    flex: 1; font-size: 0.85rem; color: #0f0; word-break: break-all;
+    background: #000; border: 1px dashed #0f0; padding: 9px 12px;
   }
+
   footer { text-align: center; margin-top: 60px; padding-top: 30px; border-top: 1px dashed #0f0; color: #0a0; font-size: 0.85rem; }
   footer a { color: #0f0; text-decoration: none; margin: 0 8px; }
+  footer a:hover { text-decoration: underline; text-shadow: 0 0 5px #0f0; }
 </style>
 </head>
 <body>
@@ -227,6 +284,7 @@
 </div>
 
 <script>
+// --- Matrix Code Rain Logic ---
 const canvas = document.getElementById('matrix');
 const ctx = canvas.getContext('2d');
 canvas.width = window.innerWidth;
@@ -252,6 +310,58 @@ function drawMatrix() {
 setInterval(drawMatrix, 35);
 window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
 
+// --- Hacker Audio & Speech Logic ---
+const AudioContext = window.SystemAudioContext || window.AudioContext || window.webkitAudioContext;
+let audioCtx = null;
+
+function initAudio() {
+    if (!audioCtx) {
+        audioCtx = new AudioContext();
+    }
+    if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+    }
+}
+
+function playBeep(type = 'type') {
+    try {
+        initAudio();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        
+        if (type === 'type') {
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(400 + Math.random()*200, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.05);
+        } else if (type === 'success') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(587.33, audioCtx.currentTime);
+            osc.frequency.setValueAtTime(880, audioCtx.currentTime + 0.12);
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.35);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.35);
+        } else if (type === 'error') {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.2);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.2);
+        }
+    } catch(e) {
+        console.log("Audio error", e);
+    }
+}
+
+document.addEventListener('keydown', () => playBeep('type'));
+document.addEventListener('click', () => playBeep('type'));
+
 const PASSWORD = "rg999";
 const STORAGE_KEY = "jamal_hub_unlocked";
 
@@ -262,13 +372,26 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 function checkPass() {
+  initAudio();
   const input = document.getElementById('lockInput').value;
   const err = document.getElementById('lockError');
+
   if (input === PASSWORD) {
     sessionStorage.setItem(STORAGE_KEY, "yes");
+    
+    // Voice Greeting Feature
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const speech = new SpeechSynthesisUtterance("Welcome back boss, Jamalhacks API center mein aapka swagat hai");
+      speech.rate = 0.95;
+      speech.pitch = 1.0;
+      window.speechSynthesis.speak(speech);
+    }
+
     unlock();
   } else {
     err.textContent = "❌ ACCESS DENIED";
+    playBeep('error');
     document.getElementById('lockInput').value = "";
   }
 }
@@ -279,11 +402,11 @@ function unlock() {
 }
 
 function genKey() {
+  playBeep('success'); // Successful token generation sound
   const user = document.getElementById('keyUser').value.trim().toLowerCase() || 'jamal';
-  const plan = document.getElementById('keyPlan').value; // e.g. 2d, 15d, permanent
+  const plan = document.getElementById('keyPlan').value;
   const number = document.getElementById('keyNumber').value.trim() || '9876543210';
   
-  // Key ab name aur plan ke sath banegi (jaise: jamal-2d ya jamal-permanent)
   const key = `${user}-${plan}`;
   const fullUrl = `${window.location.origin}/api/number?number=${encodeURIComponent(number)}&key=${encodeURIComponent(key)}`;
 
@@ -293,6 +416,7 @@ function genKey() {
 }
 
 function copyText(id) {
+  playBeep('success');
   const text = document.getElementById(id).textContent;
   navigator.clipboard.writeText(text).then(() => {
     const el = document.getElementById(id);
