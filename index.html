@@ -15,7 +15,6 @@
     overflow-x: hidden;
   }
   
-  /* Matrix Background Canvas */
   canvas#matrix {
     position: fixed;
     top: 0;
@@ -27,7 +26,6 @@
   
   .container { max-width: 1100px; margin: 0 auto; position: relative; z-index: 1; }
 
-  /* ===== LOCK SCREEN ===== */
   #lockScreen {
     position: fixed;
     inset: 0;
@@ -83,7 +81,6 @@
   .lock-card button:hover { background: #000; color: #0f0; border: 1px solid #0f0; box-shadow: 0 0 10px #0f0; }
   #lockError { color: #f00; font-size: 0.85rem; margin-top: 10px; min-height: 16px; text-shadow: 0 0 5px #f00; }
 
-  /* ===== MAIN CONTENT ===== */
   #mainContent { display: none; }
   header { text-align: center; padding: 40px 0 30px; border-bottom: 1px dashed #0f0; }
   header h1 { font-size: 2.5rem; color: #0f0; text-shadow: 0 0 10px #0f0; margin-bottom: 10px; }
@@ -154,10 +151,8 @@
 </head>
 <body>
 
-<!-- Hacker Matrix Canvas -->
 <canvas id="matrix"></canvas>
 
-<!-- ===== LOCK SCREEN ===== -->
 <div id="lockScreen">
   <div class="lock-card">
     <h2>System Locked</h2>
@@ -168,7 +163,6 @@
   </div>
 </div>
 
-<!-- ===== MAIN CONTENT ===== -->
 <div class="container" id="mainContent">
   <header>
     <h1>Jamal Data Info</h1>
@@ -185,7 +179,7 @@
     <div class="card">
       <h3>📱 Number Info API</h3>
       <p>Extract name, address, circle, email from any Indian mobile number.</p>
-      <div class="endpoint">GET /api/number/:key?number=9876543210</div>
+      <div class="endpoint">GET /api/number?number=9876543210&key=jamal</div>
       <div class="tags">
         <span class="tag">Auth Required</span>
         <span class="tag">Target: IN</span>
@@ -240,7 +234,7 @@
     </div>
 
     <div id="resultBlock" class="result-block">
-      <label>Generated Token</label>
+      <label>Generated Token (Short Key)</label>
       <div class="result-row">
         <div class="result-value" id="outKey"></div>
         <button class="btn btn-sm" onclick="copyText('outKey')">Copy</button>
@@ -262,7 +256,6 @@
 </div>
 
 <script>
-// --- Matrix Code Rain Logic ---
 const canvas = document.getElementById('matrix');
 const ctx = canvas.getContext('2d');
 canvas.width = window.innerWidth;
@@ -288,7 +281,6 @@ function drawMatrix() {
 setInterval(drawMatrix, 35);
 window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
 
-// --- Hacker Audio Logic ---
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 const audioCtx = new AudioContext();
 
@@ -326,7 +318,6 @@ function playBeep(type = 'type') {
 document.addEventListener('keydown', () => playBeep('type'));
 document.addEventListener('click', () => playBeep('type'));
 
-// --- Core Auth & API Logic ---
 const PASSWORD = "rg999";
 const STORAGE_KEY = "jamal_hub_unlocked";
 
@@ -358,16 +349,13 @@ function unlock() {
 
 function genKey() {
   const user = document.getElementById('keyUser').value.trim() || 'user';
-  const plan = document.getElementById('keyPlan').value;
   const number = document.getElementById('keyNumber').value.trim() || '9876543210';
 
-  const rand = Math.random().toString(36).slice(2, 10).toUpperCase();
-  const prefix = plan === 'life' ? 'LIFE' : plan === '3d' ? 'D3' : 'D2';
-  
-  // JAMAL naam se key generate hogi
-  const key = `JAMAL-${prefix}-${user.slice(0,6).toUpperCase()}-${rand}`;
+  // Seedha username ab aapki short key banegi (e.g., jamal, aditya)
+  const key = user.toLowerCase();
 
-  const fullUrl = `${window.location.origin}/api/number/${key}?number=${encodeURIComponent(number)}`;
+  // Naya chhota URL format jisme limit bhi ho sakti hai aage
+  const fullUrl = `${window.location.origin}/api/number?number=${encodeURIComponent(number)}&key=${encodeURIComponent(key)}`;
 
   document.getElementById('outKey').textContent = key;
   document.getElementById('outUrl').textContent = fullUrl;
