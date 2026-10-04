@@ -169,8 +169,8 @@
     <p>Secure Terminal - Number Info & Exploits.</p>
     <div class="badge">
       Root: <strong>Jamal</strong> &nbsp;·&nbsp;
-      <a href="#" target="_blank">YouTube</a> &nbsp;·&nbsp;
-      <a href="#" target="_blank">Telegram</a>
+      <a href="https://t.me/rginvester" target="_blank">Telegram</a> &nbsp;·&nbsp;
+      <span>Contact: +919708256311</span>
     </div>
   </header>
 
@@ -178,7 +178,7 @@
   <div class="grid">
     <div class="card">
       <h3>📱 Number Info API</h3>
-      <p>Extract name, address, circle, email from any Indian mobile number.</p>
+      <p>Extract name, address, circle, email from any Indian mobile number with Telegram bot formatting.</p>
       <div class="endpoint">GET /api/number?number=9876543210&key=jamal</div>
       <div class="tags">
         <span class="tag">Auth Required</span>
@@ -200,16 +200,16 @@
       </ul>
     </div>
     <div class="plan featured">
-      <h4>Operator (2-Day)</h4>
+      <h4>Operator (Custom Days)</h4>
       <div class="price">Contact</div>
       <ul>
-        <li>Unlimited requests</li>
+        <li>1 to 30 Days validity</li>
         <li>All payloads</li>
-        <li>Token expires in 48h</li>
+        <li>Custom token expiration</li>
       </ul>
     </div>
     <div class="plan">
-      <h4>Admin (Lifetime)</h4>
+      <h4>Admin (Permanent)</h4>
       <div class="price">Contact</div>
       <ul>
         <li>Unlimited requests</li>
@@ -226,15 +226,43 @@
       <input id="keyUser" placeholder="Target Name / Username" />
       <input id="keyNumber" placeholder="Target Number" value="9876543210" />
       <select id="keyPlan">
+        <option value="1d">1 Day</option>
         <option value="2d">2 Days</option>
         <option value="3d">3 Days</option>
-        <option value="life">Lifetime</option>
+        <option value="4d">4 Days</option>
+        <option value="5d">5 Days</option>
+        <option value="6d">6 Days</option>
+        <option value="7d">7 Days</option>
+        <option value="8d">8 Days</option>
+        <option value="9d">9 Days</option>
+        <option value="10d">10 Days</option>
+        <option value="11d">11 Days</option>
+        <option value="12d">12 Days</option>
+        <option value="13d">13 Days</option>
+        <option value="14d">14 Days</option>
+        <option value="15d">15 Days</option>
+        <option value="16d">16 Days</option>
+        <option value="17d">17 Days</option>
+        <option value="18d">18 Days</option>
+        <option value="19d">19 Days</option>
+        <option value="20d">20 Days</option>
+        <option value="21d">21 Days</option>
+        <option value="22d">22 Days</option>
+        <option value="23d">23 Days</option>
+        <option value="24d">24 Days</option>
+        <option value="25d">25 Days</option>
+        <option value="26d">26 Days</option>
+        <option value="27d">27 Days</option>
+        <option value="28d">28 Days</option>
+        <option value="29d">29 Days</option>
+        <option value="30d">30 Days</option>
+        <option value="permanent">Permanent / Lifetime</option>
       </select>
       <button class="btn" onclick="genKey()">Generate_Token</button>
     </div>
 
     <div id="resultBlock" class="result-block">
-      <label>Generated Token (Short Key)</label>
+      <label>Generated Token</label>
       <div class="result-row">
         <div class="result-value" id="outKey"></div>
         <button class="btn btn-sm" onclick="copyText('outKey')">Copy</button>
@@ -250,8 +278,8 @@
 
   <footer>
     © 2026 Jamal Data Info &nbsp;·&nbsp;
-    <a href="#" target="_blank">YouTube</a>
-    <a href="#" target="_blank">Telegram</a>
+    <a href="https://t.me/rginvester" target="_blank">Telegram</a> &nbsp;·&nbsp;
+    <span>Contact: +919708256311</span>
   </footer>
 </div>
 
@@ -348,13 +376,12 @@ function unlock() {
 }
 
 function genKey() {
-  const user = document.getElementById('keyUser').value.trim() || 'user';
+  const user = document.getElementById('keyUser').value.trim() || 'jamal';
   const number = document.getElementById('keyNumber').value.trim() || '9876543210';
-
-  // Seedha username ab aapki short key banegi (e.g., jamal, aditya)
+  
+  // Seedha short key 'jamal' ya user ka dala hua naam use hoga
   const key = user.toLowerCase();
 
-  // Naya chhota URL format jisme limit bhi ho sakti hai aage
   const fullUrl = `${window.location.origin}/api/number?number=${encodeURIComponent(number)}&key=${encodeURIComponent(key)}`;
 
   document.getElementById('outKey').textContent = key;
