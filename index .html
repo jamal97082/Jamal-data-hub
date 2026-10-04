@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Jamal Data Info</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Courier New', Courier, monospace;
+    background: #000;
+    color: #0f0;
+    min-height: 100vh;
+    padding: 24px;
+    overflow-x: hidden;
+  }
+  
+  /* Matrix Background Canvas */
+  canvas#matrix {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+  }
+  
+  .container { max-width: 1100px; margin: 0 auto; position: relative; z-index: 1; }
+
+  /* ===== LOCK SCREEN ===== */
+  #lockScreen {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+  }
+  .lock-card {
+    background: rgba(0, 20, 0, 0.8);
+    border: 2px solid #0f0;
+    box-shadow: 0 0 15px #0f0;
+    border-radius: 8px;
+    padding: 36px 30px;
+    width: 100%;
+    max-width: 360px;
+    text-align: center;
+  }
+  .lock-card h2 {
+    font-size: 1.5rem;
+    color: #0f0;
+    text-shadow: 0 0 5px #0f0;
+    margin-bottom: 8px;
+  }
+  .lock-card p { color: #0a0; font-size: 0.9rem; margin-bottom: 20px; }
+  .lock-card input {
+    width: 100%;
+    padding: 12px 14px;
+    background: #000;
+    border: 1px solid #0f0;
+    color: #0f0;
+    font-size: 1rem;
+    outline: none;
+    margin-bottom: 12px;
+    text-align: center;
+    letter-spacing: 2px;
+    font-family: 'Courier New', Courier, monospace;
+  }
+  .lock-card input:focus { box-shadow: 0 0 10px #0f0; }
+  .lock-card button {
+    width: 100%;
+    padding: 12px;
+    background: #0f0;
+    color: #000;
+    font-weight: 900;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+    font-family: 'Courier New', Courier, monospace;
+    transition: 0.2s;
+  }
+  .lock-card button:hover { background: #000; color: #0f0; border: 1px solid #0f0; box-shadow: 0 0 10px #0f0; }
+  #lockError { color: #f00; font-size: 0.85rem; margin-top: 10px; min-height: 16px; text-shadow: 0 0 5px #f00; }
+
+  /* ===== MAIN CONTENT ===== */
+  #mainContent { display: none; }
+  header { text-align: center; padding: 40px 0 30px; border-bottom: 1px dashed #0f0; }
+  header h1 { font-size: 2.5rem; color: #0f0; text-shadow: 0 0 10px #0f0; margin-bottom: 10px; }
+  header p { color: #0a0; font-size: 1rem; }
+  .badge {
+    display: inline-block;
+    margin-top: 14px;
+    padding: 6px 14px;
+    background: rgba(0,255,0,0.1);
+    border: 1px solid #0f0;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    color: #0f0;
+  }
+  .badge a { color: #0f0; text-decoration: underline; }
+
+  h2.section-title { margin: 40px 0 18px; font-size: 1.3rem; color: #0f0; border-left: 3px solid #0f0; padding-left: 10px; text-shadow: 0 0 5px #0f0; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 18px; }
+  .card, .plan, .key-box, .result-block {
+    background: rgba(0, 20, 0, 0.85);
+    border: 1px solid #0f0;
+    border-radius: 4px;
+    padding: 22px;
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .card:hover, .plan:hover { transform: translateY(-3px); box-shadow: 0 0 15px #0f0; }
+  .card h3, .plan h4, .key-box h3 { font-size: 1.1rem; color: #0f0; margin-bottom: 8px; text-shadow: 0 0 5px #0f0; }
+  .card p, .plan ul, .key-box p { font-size: 0.9rem; color: #0a0; line-height: 1.5; margin-bottom: 14px; }
+  .endpoint {
+    background: #000; border: 1px solid #0f0; border-radius: 4px; padding: 10px 12px;
+    font-size: 0.82rem; color: #0f0; word-break: break-all; margin-bottom: 14px;
+  }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+  .tag { font-size: 0.72rem; padding: 3px 9px; background: rgba(0,255,0,0.1); border: 1px solid #0f0; color: #0f0; }
+  .btn {
+    display: inline-block; padding: 9px 16px; background: #0f0; color: #000; font-weight: bold;
+    border-radius: 4px; text-decoration: none; font-size: 0.85rem; border: 1px solid #0f0; cursor: pointer;
+    font-family: 'Courier New', Courier, monospace; transition: 0.2s;
+  }
+  .btn:hover { background: #000; color: #0f0; box-shadow: 0 0 10px #0f0; }
+  .btn-sm { padding: 7px 12px; font-size: 0.78rem; }
+
+  .plans { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+  .plan { text-align: center; }
+  .plan .price { font-size: 1.6rem; color: #0f0; margin: 10px 0; font-weight: 700; text-shadow: 0 0 8px #0f0; }
+  .plan ul { list-style: none; }
+
+  .key-row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .key-row input, .key-row select {
+    flex: 1; min-width: 180px; padding: 11px 14px; background: #000; border: 1px solid #0f0;
+    color: #0f0; font-size: 0.9rem; outline: none; font-family: 'Courier New', Courier, monospace;
+  }
+  .key-row input:focus, .key-row select:focus { box-shadow: 0 0 8px #0f0; }
+
+  .result-block { margin-top: 20px; display: none; }
+  .result-block label { display: block; font-size: 0.85rem; color: #0a0; margin-bottom: 6px; text-transform: uppercase; }
+  .result-row { display: flex; gap: 8px; align-items: center; margin-bottom: 14px; }
+  .result-row:last-child { margin-bottom: 0; }
+  .result-value {
+    flex: 1; font-size: 0.85rem; color: #0f0; word-break: break-all;
+    background: #000; border: 1px dashed #0f0; padding: 9px 12px;
+  }
+
+  footer { text-align: center; margin-top: 60px; padding-top: 30px; border-top: 1px dashed #0f0; color: #0a0; font-size: 0.85rem; }
+  footer a { color: #0f0; text-decoration: none; margin: 0 8px; }
+  footer a:hover { text-decoration: underline; text-shadow: 0 0 5px #0f0; }
+</style>
+</head>
+<body>
+
+<!-- Hacker Matrix Canvas -->
+<canvas id="matrix"></canvas>
+
+<!-- ===== LOCK SCREEN ===== -->
+<div id="lockScreen">
+  <div class="lock-card">
+    <h2>System Locked</h2>
+    <p>Jamal Data Info Terminal</p>
+    <input id="lockInput" type="password" placeholder="ENTER PASSWORD" onkeydown="if(event.key==='Enter')checkPass()" />
+    <button onclick="checkPass()">ACCESS</button>
+    <div id="lockError"></div>
+  </div>
+</div>
+
+<!-- ===== MAIN CONTENT ===== -->
+<div class="container" id="mainContent">
+  <header>
+    <h1>Jamal Data Info</h1>
+    <p>Secure Terminal - Number Info & Exploits.</p>
+    <div class="badge">
+      Root: <strong>Jamal</strong> &nbsp;·&nbsp;
+      <a href="#" target="_blank">YouTube</a> &nbsp;·&nbsp;
+      <a href="#" target="_blank">Telegram</a>
+    </div>
+  </header>
+
+  <h2 class="section-title">Available APIs</h2>
+  <div class="grid">
+    <div class="card">
+      <h3>📱 Number Info API</h3>
+      <p>Extract name, address, circle, email from any Indian mobile number.</p>
+      <div class="endpoint">GET /api/number/:key?number=9876543210</div>
+      <div class="tags">
+        <span class="tag">Auth Required</span>
+        <span class="tag">Target: IN</span>
+      </div>
+      <a class="btn" href="#" onclick="alert('ACCESS DENIED: Generate Token First.'); return false;">Execute</a>
+    </div>
+  </div>
+
+  <h2 class="section-title">Access Tiers</h2>
+  <div class="plans">
+    <div class="plan">
+      <h4>Guest</h4>
+      <div class="price">₹0</div>
+      <ul>
+        <li>Limited requests</li>
+        <li>Basic payloads only</li>
+        <li>No auth required</li>
+      </ul>
+    </div>
+    <div class="plan featured">
+      <h4>Operator (2-Day)</h4>
+      <div class="price">Contact</div>
+      <ul>
+        <li>Unlimited requests</li>
+        <li>All payloads</li>
+        <li>Token expires in 48h</li>
+      </ul>
+    </div>
+    <div class="plan">
+      <h4>Admin (Lifetime)</h4>
+      <div class="price">Contact</div>
+      <ul>
+        <li>Unlimited requests</li>
+        <li>All payloads</li>
+        <li>Never expires</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="key-box">
+    <h3>🔑 Keygen Utility</h3>
+    <p>Enter user details to generate a valid access token and endpoint.</p>
+    <div class="key-row">
+      <input id="keyUser" placeholder="Target Name / Username" />
+      <input id="keyNumber" placeholder="Target Number" value="9876543210" />
+      <select id="keyPlan">
+        <option value="2d">2 Days</option>
+        <option value="3d">3 Days</option>
+        <option value="life">Lifetime</option>
+      </select>
+      <button class="btn" onclick="genKey()">Generate_Token</button>
+    </div>
+
+    <div id="resultBlock" class="result-block">
+      <label>Generated Token</label>
+      <div class="result-row">
+        <div class="result-value" id="outKey"></div>
+        <button class="btn btn-sm" onclick="copyText('outKey')">Copy</button>
+      </div>
+
+      <label>Payload Endpoint</label>
+      <div class="result-row">
+        <div class="result-value" id="outUrl"></div>
+        <button class="btn btn-sm" onclick="copyText('outUrl')">Copy</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    © 2026 Jamal Data Info &nbsp;·&nbsp;
+    <a href="#" target="_blank">YouTube</a>
+    <a href="#" target="_blank">Telegram</a>
+  </footer>
+</div>
+
+<script>
+// --- Matrix Code Rain Logic ---
+const canvas = document.getElementById('matrix');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*<>[]{}'.split('');
+const fontSize = 16;
+const columns = canvas.width / fontSize;
+const drops = [];
+for(let x = 0; x < columns; x++) drops[x] = 1;
+
+function drawMatrix() {
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#0f0';
+    ctx.font = fontSize + 'px monospace';
+    for(let i = 0; i < drops.length; i++) {
+        const text = chars[Math.floor(Math.random() * chars.length)];
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+        if(drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+        drops[i]++;
+    }
+}
+setInterval(drawMatrix, 35);
+window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
+
+// --- Hacker Audio Logic ---
+const AudioContext = window.AudioContext || window.webkitAudioContext;
+const audioCtx = new AudioContext();
+
+function playBeep(type = 'type') {
+    if(audioCtx.state === 'suspended') audioCtx.resume();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    
+    if (type === 'type') {
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(400 + Math.random()*200, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.05);
+    } else if (type === 'unlock') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.3);
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.3);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.3);
+    } else if (type === 'error') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.2);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.2);
+    }
+}
+document.addEventListener('keydown', () => playBeep('type'));
+document.addEventListener('click', () => playBeep('type'));
+
+// --- Core Auth & API Logic ---
+const PASSWORD = "rg999";
+const STORAGE_KEY = "jamal_hub_unlocked";
+
+window.addEventListener('DOMContentLoaded', () => {
+  if (sessionStorage.getItem(STORAGE_KEY) === "yes") {
+    unlock();
+  }
+});
+
+function checkPass() {
+  const input = document.getElementById('lockInput').value;
+  const err = document.getElementById('lockError');
+
+  if (input === PASSWORD) {
+    sessionStorage.setItem(STORAGE_KEY, "yes");
+    playBeep('unlock');
+    unlock();
+  } else {
+    err.textContent = "❌ ACCESS DENIED";
+    playBeep('error');
+    document.getElementById('lockInput').value = "";
+  }
+}
+
+function unlock() {
+  document.getElementById('lockScreen').style.display = "none";
+  document.getElementById('mainContent').style.display = "block";
+}
+
+function genKey() {
+  const user = document.getElementById('keyUser').value.trim() || 'user';
+  const plan = document.getElementById('keyPlan').value;
+  const number = document.getElementById('keyNumber').value.trim() || '9876543210';
+
+  const rand = Math.random().toString(36).slice(2, 10).toUpperCase();
+  const prefix = plan === 'life' ? 'LIFE' : plan === '3d' ? 'D3' : 'D2';
+  
+  // JAMAL naam se key generate hogi
+  const key = `JAMAL-${prefix}-${user.slice(0,6).toUpperCase()}-${rand}`;
+
+  const fullUrl = `${window.location.origin}/api/number/${key}?number=${encodeURIComponent(number)}`;
+
+  document.getElementById('outKey').textContent = key;
+  document.getElementById('outUrl').textContent = fullUrl;
+  document.getElementById('resultBlock').style.display = 'block';
+}
+
+function copyText(id) {
+  const text = document.getElementById(id).textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const el = document.getElementById(id);
+    const original = el.textContent;
+    el.textContent = '✅ Copied!';
+    setTimeout(() => { el.textContent = original; }, 1200);
+  });
+}
+</script>
+</body>
+</html>
