@@ -27,8 +27,8 @@ export default async function handler(req, res) {
     });
   }
 
-  // Yaha JAMAL se shuru hone wali key hi pass hogi
-  if (!key.startsWith('JAMAL-')) {
+  // Yahan set kiya gaya hai ki key sirf 'jamal' honi chahiye
+  if (key.toLowerCase() !== 'jamal') {
     return res.status(401).json({
       status: "error",
       message: "invalid key",
