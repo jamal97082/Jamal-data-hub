@@ -35,7 +35,6 @@ export default async function handler(req, res) {
     );
     const data = await upstream.json();
 
-    // Aapke screenshot jaisa Telegram Bot Style Formatting
     let telegramStyleText = "No data found";
     
     if (data.data) {
