@@ -19,7 +19,19 @@ export default async function handler(req, res) {
     });
   }
 
-  if (!key || key.toLowerCase() !== 'jamal') {
+  if (!key) {
+    return res.status(401).json({
+      status: "error",
+      message: "key required",
+      developer: "Jamal",
+      contact: "+919708256311",
+      telegram: "https://t.me/rginvester"
+    });
+  }
+
+  // Yeh check karega ki key 'jamal-' se shuru hoti hai ya 'jamal' hai (jaise jamal-2d, jamal-permanent)
+  const lowerKey = key.toLowerCase();
+  if (!lowerKey.startsWith('jamal')) {
     return res.status(401).json({
       status: "error",
       message: "invalid key",
