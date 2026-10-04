@@ -19,22 +19,10 @@ export default async function handler(req, res) {
     });
   }
 
-  if (!key) {
+  if (!key || !key.toLowerCase().startsWith('jamal')) {
     return res.status(401).json({
       status: "error",
-      message: "key required",
-      developer: "Jamal",
-      contact: "+919708256311",
-      telegram: "https://t.me/rginvester"
-    });
-  }
-
-  // Yeh check karega ki key 'jamal-' se shuru hoti hai ya 'jamal' hai (jaise jamal-2d, jamal-permanent)
-  const lowerKey = key.toLowerCase();
-  if (!lowerKey.startsWith('jamal')) {
-    return res.status(401).json({
-      status: "error",
-      message: "invalid key",
+      message: "invalid or missing key",
       developer: "Jamal",
       contact: "+919708256311",
       telegram: "https://t.me/rginvester"
@@ -50,15 +38,23 @@ export default async function handler(req, res) {
     let telegramStyleText = "No data found";
     
     if (data.data) {
+      let d = data.data;
       telegramStyleText = `👤 Record #1\n`;
-      telegramStyleText += `├── Name      : ${data.data.name || 'N/A'}\n`;
-      telegramStyleText += `├── Father    : ${data.data.fatherName || data.data.father_name || 'N/A'}\n`;
+      telegramStyleText += `├── Name      : ${d.name || d.NAME || 'N/A'}\n`;
+      telegramStyleText += `├── Father    : ${d.fatherName || d.father_name || d.FATHER_NAME || 'N/A'}\n`;
       telegramStyleText += `├── Mobile    : ${number}\n`;
-      telegramStyleText += `├── Alt. Num  : ${data.data.alt || 'N/A'}\n`;
-      telegramStyleText += `├── 🆔 Aadhaar: ${data.data.aadhaar || 'N/A'}\n`;
-      telegramStyleText += `├── Email     : ${data.data.email || 'N/A'}\n`;
-      telegramStyleText += `├── Circle    : ${data.data.circle || 'N/A'}\n`;
-      telegramStyleText += `└── Address   : ${data.data.address || 'N/A'}`;
+      telegramStyleText += `├── Alt. Num  : ${d.alt || d.ALT || 'N/A'}\n`;
+      telegramStyleText += `├── 🆔 ID/Doc : ${d.aadhaar || d.ID || d.id || d.ADHAAR || 'N/A'}\n`;
+      telegramStyleText += `├── Email     : ${d.email || d.EMAIL || 'N/A'}\n`;
+      telegramStyleText += `├── Circle    : ${d.circle || d.CIRCLE || 'N/A'}\n`;
+      telegramStyleText += `└── Address   : ${d.address || d.ADDRESS || 'N/A'}`;
+
+      // Agar upstream se koi bhi aur extra fields aate hain, toh unhe bhi automatically jod do
+      for (const k in d) {
+        if (!["name", "NAME", "fatherName", "father_name", "FATHER_NAME", "alt", "ALT", "aadhaar", "ID", "id", "ADHAAR", "email", "EMAIL", "circle", "CIRCLE", "address", "ADDRESS"].includes(k)) {
+          telegramStyleText += `\n├── ${k} : ${d[k]}`;
+        }
+      }
     }
 
     return res.status(200).json({
