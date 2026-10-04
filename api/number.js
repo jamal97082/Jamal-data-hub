@@ -35,35 +35,30 @@ export default async function handler(req, res) {
     );
     const data = await upstream.json();
 
-    let telegramStyleText = "No data found";
+    let formattedData = null;
     
     if (data.data) {
       let d = data.data;
-      telegramStyleText = `👤 Record #1\n`;
-      telegramStyleText += `├── Name      : ${d.name || d.NAME || 'N/A'}\n`;
-      telegramStyleText += `├── Father    : ${d.fatherName || d.father_name || d.FATHER_NAME || 'N/A'}\n`;
-      telegramStyleText += `├── Mobile    : ${number}\n`;
-      telegramStyleText += `├── Alt. Num  : ${d.alt || d.ALT || 'N/A'}\n`;
-      telegramStyleText += `├── 🆔 ID/Doc : ${d.aadhaar || d.ID || d.id || d.ADHAAR || 'N/A'}\n`;
-      telegramStyleText += `├── Email     : ${d.email || d.EMAIL || 'N/A'}\n`;
-      telegramStyleText += `├── Circle    : ${d.circle || d.CIRCLE || 'N/A'}\n`;
-      telegramStyleText += `└── Address   : ${d.address || d.ADDRESS || 'N/A'}`;
-
-      // Agar upstream se koi bhi aur extra fields aate hain, toh unhe bhi automatically jod do
-      for (const k in d) {
-        if (!["name", "NAME", "fatherName", "father_name", "FATHER_NAME", "alt", "ALT", "aadhaar", "ID", "id", "ADHAAR", "email", "EMAIL", "circle", "CIRCLE", "address", "ADDRESS"].includes(k)) {
-          telegramStyleText += `\n├── ${k} : ${d[k]}`;
-        }
-      }
+      formattedData = {};
+      
+      // Pehle jaisa simple format aur icons/emojis ke sath
+      formattedData["👤 Name"] = d.name || d.NAME || 'N/A';
+      formattedData["👨‍👦 Father's Name"] = d.fatherName || d.father_name || d.FATHER_NAME || 'N/A';
+      formattedData["📱 Mobile"] = number;
+      formattedData["📞 Alt. Number"] = d.alt || d.ALT || 'N/A';
+      formattedData["🆔 ID / Aadhaar"] = d.aadhaar || d.ID || d.id || d.ADHAAR || 'N/A';
+      formattedData["📧 Email"] = d.email || d.EMAIL || 'N/A';
+      formattedData["📡 Circle"] = d.circle || d.CIRCLE || 'N/A';
+      formattedData["🏠 Address"] = d.address || d.ADDRESS || 'N/A';
     }
 
     return res.status(200).json({
       status: data.status || "success",
+      number: data.number || number,
+      data: formattedData || data.data || null,
       developer: "Jamal",
       contact: "+919708256311",
-      telegram: "https://t.me/rginvester",
-      bot_format: telegramStyleText,
-      raw_data: data.data || null
+      telegram: "https://t.me/rginvester"
     });
     
   } catch (err) {
