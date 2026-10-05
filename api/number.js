@@ -51,7 +51,6 @@ export default async function handler(req, res) {
       }
 
       let alt = d.alt || d.ALT || '';
-      let idDoc = d.aadhaar || d.ID || d.id || d.ADHAAR || '';
       let email = d.email || d.EMAIL || '';
       let circle = d.circle || d.CIRCLE || '';
 
@@ -68,9 +67,6 @@ export default async function handler(req, res) {
 
       if (alt && alt !== 'N/A') {
         cleanDataObject["📞 Alt. Number"] = alt;
-      }
-      if (idDoc && idDoc !== 'N/A') {
-        cleanDataObject["🆔 ID / Document"] = idDoc;
       }
       if (email && email !== 'N/A') {
         cleanDataObject["📧 Email"] = email;
