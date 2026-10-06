@@ -1,8 +1,10 @@
 export default async function handler(req, res) {
+  // CORS Headers (Frontend se connect hone ke liye)
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
   if (req.method === 'OPTIONS') {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     return res.status(204).end();
   }
 
@@ -12,52 +14,73 @@ export default async function handler(req, res) {
   if (!number) {
     return res.status(400).json({
       status: "error",
-      message: "number parameter required",
+      message: "Number parameter is required",
       developer: "jamalhacks",
       contact: "+919708256311",
       telegram: "https://t.me/rginvester"
     });
   }
 
-  // 1. Basic Key Check (Jo pehle tha)
-  if (!key || !key.toLowerCase().startsWith('jamal')) {
+  if (!key) {
     return res.status(401).json({
       status: "error",
-      message: "invalid or missing key",
+      message: "API Key is required",
       developer: "jamalhacks",
       contact: "+919708256311",
       telegram: "https://t.me/rginvester"
     });
   }
 
-  // 2. STRICT EXPIRY LOGIC (Aditya jaisa fraud block karne ke liye)
-  const parts = key.toLowerCase().split('-');
-  if (parts.length < 2) {
-    return res.status(401).json({
-      status: "error",
-      message: "Invalid key format",
-      developer: "jamalhacks",
-      contact: "+919708256311",
-      telegram: "https://t.me/rginvester"
-    });
-  }
+  const keyLower = key.toLowerCase();
 
-  const expiry = parts[1];
-  if (expiry !== "permanent") {
-    const expiryTime = parseInt(expiry, 10);
-    // Agar time manipulate kiya gaya hai ya current time expiry se zyada ho gaya hai
-    if (isNaN(expiryTime) || Date.now() > expiryTime) {
-      return res.status(403).json({
+  // ==========================================
+  // 1. MASTER KEY & EXPIRY SYSTEM
+  // ==========================================
+  
+  // Agar API key sirf 'jamal' hai, to bina kisi rok-tok ke allow karo (Master Key)
+  if (keyLower !== 'jamal') {
+    
+    // Agar Master Key nahi hai, to format check karo (jamal- se start hona chahiye)
+    if (!keyLower.startsWith('jamal-')) {
+      return res.status(401).json({
         status: "error",
-        message: "Key Expired. Please contact Admin to renew.",
-        developer: "jamalhacks",
-        contact: "+919708256311",
-        telegram: "https://t.me/rginvester"
+        message: "Invalid Key Format. Access Denied.",
+        developer: "jamalhacks"
       });
+    }
+
+    // Key format split karo (e.g., jamal-D2-1730000000000)
+    const parts = keyLower.split('-');
+    const expiryPart = parts[parts.length - 1]; // Last wala part pakdo (timestamp)
+
+    if (expiryPart !== "permanent") {
+      const expiryTime = parseInt(expiryPart, 10);
+      
+      // Agar time ki jagah kuch aur likha hai
+      if (isNaN(expiryTime)) {
+        return res.status(401).json({
+          status: "error",
+          message: "Invalid Expiry Format inside Key.",
+          developer: "jamalhacks"
+        });
+      }
+
+      // ⏳ EXPIRY CHECK: Agar aaj ka time key ke time se aage nikal gaya hai
+      if (Date.now() > expiryTime) {
+        return res.status(403).json({
+          status: "error",
+          message: "Key Expired! Please contact Admin to renew.",
+          developer: "jamalhacks",
+          contact: "+919708256311",
+          telegram: "https://t.me/rginvester"
+        });
+      }
     }
   }
 
-  // 3. Upstream Data Fetching (Original Code)
+  // ==========================================
+  // 2. DATA FETCHING SYSTEM
+  // ==========================================
   try {
     const upstream = await fetch(
       `https://numberinfo-api-adibhai.vercel.app/api/number?number=${encodeURIComponent(number)}`
@@ -72,6 +95,7 @@ export default async function handler(req, res) {
       let address = d.address || d.ADDRESS || '';
       let father = d.fatherName || d.father_name || d.FATHER_NAME || '';
 
+      // Agar father name nahi hai to address se nikalne ka try karo
       if (!father || father === 'N/A' || father === '') {
         const soMatch = address.match(/(?:S\/O|C\/O|W\/O)\s+([^,]+)/i);
         if (soMatch && soMatch[1]) {
@@ -83,46 +107,15 @@ export default async function handler(req, res) {
       let email = d.email || d.EMAIL || '';
       let circle = d.circle || d.CIRCLE || '';
 
-      cleanDataObject = {};
-
-      if (name) {
-        cleanDataObject["👤 Name"] = name;
-      }
-      if (father && father !== 'N/A') {
-        cleanDataObject["👨‍👦 Father's Name"] = father;
-      }
-      
+      if (name) cleanDataObject["👤 Name"] = name;
+      if (father && father !== 'N/A') cleanDataObject["👨‍👦 Father's Name"] = father;
       cleanDataObject["📱 Mobile"] = number;
-
-      if (alt && alt !== 'N/A') {
-        cleanDataObject["📞 Alt. Number"] = alt;
-      }
-      if (email && email !== 'N/A') {
-        cleanDataObject["📧 Email"] = email;
-      }
-      if (circle && circle !== 'N/A') {
-        cleanDataObject["📡 Circle"] = circle;
-      }
-      if (address) {
-        cleanDataObject["🏠 Address"] = address;
-      }
+      if (alt && alt !== 'N/A') cleanDataObject["📞 Alt. Number"] = alt;
+      if (email && email !== 'N/A') cleanDataObject["📧 Email"] = email;
+      if (circle && circle !== 'N/A') cleanDataObject["📡 Circle"] = circle;
+      if (address) cleanDataObject["🏠 Address"] = address;
     }
 
-    return res.status(200).json({
-      status: data.status || "success",
-      data: cleanDataObject,
-      developer: "jamalhacks",
-      contact: "+919708256311",
-      telegram: "https://t.me/rginvester"
-    });
-    
-  } catch (err) {
-    return res.status(500).json({
-      status: "error",
-      message: "upstream fetch failed",
-      developer: "jamalhacks",
-      contact: "+919708256311",
-      telegram: "https://t.me/rginvester"
-    });
-  }
-}
+    // Aapke terminal UI ke liye styling format
+    let bot_format = "[+] TARGET DATA ACQUIRED [+]\n";
+    bot_format += "----------------------------\n";
