@@ -143,6 +143,8 @@
     flex: 1; font-size: 0.85rem; color: #0f0; word-break: break-all;
     background: #000; border: 1px dashed #0f0; padding: 9px 12px;
   }
+  
+  #expiryDisplay { margin-top: 15px; color: #0ff; font-size: 0.9rem; font-weight: bold; text-shadow: 0 0 5px #0ff; }
 
   footer { text-align: center; margin-top: 60px; padding-top: 30px; border-top: 1px dashed #0f0; color: #0a0; font-size: 0.85rem; }
   footer a { color: #0f0; text-decoration: none; margin: 0 8px; }
@@ -179,7 +181,7 @@
     <div class="card">
       <h3>📱 Number Info API</h3>
       <p>Extract name, address, circle, email from any Indian mobile number with Telegram bot formatting.</p>
-      <div class="endpoint">GET /api/number?number=9876543210&key=jamal-2d</div>
+      <div class="endpoint">GET /api/number?number=9876543210&key=jamal-1738493000000</div>
       <div class="tags">
         <span class="tag">Auth Required</span>
         <span class="tag">Target: IN</span>
@@ -273,6 +275,8 @@
         <div class="result-value" id="outUrl"></div>
         <button class="btn btn-sm" onclick="copyText('outUrl')">Copy</button>
       </div>
+      
+      <div id="expiryDisplay"></div>
     </div>
   </div>
 
@@ -401,17 +405,38 @@ function unlock() {
   document.getElementById('mainContent').style.display = "block";
 }
 
+// --- SECURE TIME EXPIRY LOGIC & VERCEL URL FIX ---
 function genKey() {
-  playBeep('success'); // Successful token generation sound
+  playBeep('success'); 
   const user = document.getElementById('keyUser').value.trim().toLowerCase() || 'jamal';
   const plan = document.getElementById('keyPlan').value;
   const number = document.getElementById('keyNumber').value.trim() || '9876543210';
   
-  const key = `${user}-${plan}`;
-  const fullUrl = `${window.location.origin}/api/number?number=${encodeURIComponent(number)}&key=${encodeURIComponent(key)}`;
+  let key = "";
+  let expiryText = "Lifetime / Never Expires";
+
+  if (plan === "permanent") {
+    key = `${user}-permanent`;
+  } else {
+    const days = parseInt(plan.replace('d', ''));
+    // Exact milliseconds calculate kar rahe hain aaj ke time se 
+    const expiryMs = Date.now() + (days * 24 * 60 * 60 * 1000);
+    
+    // Yahan dash ke baad expiry timestamp generate ho raha hai
+    key = `${user}-${expiryMs}`;
+    
+    const d = new Date(expiryMs);
+    expiryText = d.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+  }
+  
+  // Vercel ka exact URL add kiya gaya hai
+  const baseUrl = "https://jamal-data-hub.vercel.app";
+  const fullUrl = `${baseUrl}/api/number?number=${encodeURIComponent(number)}&key=${encodeURIComponent(key)}`;
 
   document.getElementById('outKey').textContent = key;
   document.getElementById('outUrl').textContent = fullUrl;
+  
+  document.getElementById('expiryDisplay').innerHTML = `[!] Token Expiry: ${expiryText}`;
   document.getElementById('resultBlock').style.display = 'block';
 }
 
