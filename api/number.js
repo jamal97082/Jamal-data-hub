@@ -112,22 +112,10 @@ export default async function handler(req, res) {
       if (address) cleanDataObject["🏠 Address"] = address;
     }
 
-    // Terminal jaisa green text layout banane ke liye
-    let bot_format = "[+] TARGET DATA ACQUIRED [+]\n";
-    bot_format += "----------------------------\n";
-    if (Object.keys(cleanDataObject).length > 1) {
-      for (const [k, v] of Object.entries(cleanDataObject)) {
-          bot_format += `${k.padEnd(16)}: ${v}\n`;
-      }
-    } else {
-      bot_format += "No data found for this number.\n";
-    }
-    bot_format += "----------------------------";
-
+    // Sirf clean data return hoga, bot_format hata diya gaya hai
     return res.status(200).json({
       status: data.status || "success",
       data: cleanDataObject,
-      bot_format: bot_format,
       developer: "jamalhacks",
       contact: "+919708256311",
       telegram: "https://t.me/rginvester"
