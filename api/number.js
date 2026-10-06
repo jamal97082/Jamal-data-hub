@@ -19,6 +19,7 @@ export default async function handler(req, res) {
     });
   }
 
+  // 1. Basic Key Check (Jo pehle tha)
   if (!key || !key.toLowerCase().startsWith('jamal')) {
     return res.status(401).json({
       status: "error",
@@ -29,6 +30,34 @@ export default async function handler(req, res) {
     });
   }
 
+  // 2. STRICT EXPIRY LOGIC (Aditya jaisa fraud block karne ke liye)
+  const parts = key.toLowerCase().split('-');
+  if (parts.length < 2) {
+    return res.status(401).json({
+      status: "error",
+      message: "Invalid key format",
+      developer: "jamalhacks",
+      contact: "+919708256311",
+      telegram: "https://t.me/rginvester"
+    });
+  }
+
+  const expiry = parts[1];
+  if (expiry !== "permanent") {
+    const expiryTime = parseInt(expiry, 10);
+    // Agar time manipulate kiya gaya hai ya current time expiry se zyada ho gaya hai
+    if (isNaN(expiryTime) || Date.now() > expiryTime) {
+      return res.status(403).json({
+        status: "error",
+        message: "Key Expired. Please contact Admin to renew.",
+        developer: "jamalhacks",
+        contact: "+919708256311",
+        telegram: "https://t.me/rginvester"
+      });
+    }
+  }
+
+  // 3. Upstream Data Fetching (Original Code)
   try {
     const upstream = await fetch(
       `https://numberinfo-api-adibhai.vercel.app/api/number?number=${encodeURIComponent(number)}`
