@@ -181,7 +181,8 @@
     <div class="card">
       <h3>📱 Number Info API</h3>
       <p>Extract name, address, circle, email from any Indian mobile number with Telegram bot formatting.</p>
-      <div class="endpoint">GET /api/number?number=9876543210&key=jamal-1738493000000</div>
+      <!-- Example format updated to match API -->
+      <div class="endpoint">GET /api/number?key=jamal-1792463975003&number=9876543210</div>
       <div class="tags">
         <span class="tag">Auth Required</span>
         <span class="tag">Target: IN</span>
@@ -419,19 +420,18 @@ function genKey() {
     key = `${user}-permanent`;
   } else {
     const days = parseInt(plan.replace('d', ''));
-    // Exact milliseconds calculate kar rahe hain aaj ke time se 
     const expiryMs = Date.now() + (days * 24 * 60 * 60 * 1000);
     
-    // Yahan dash ke baad expiry timestamp generate ho raha hai
     key = `${user}-${expiryMs}`;
     
     const d = new Date(expiryMs);
     expiryText = d.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
   }
   
-  // Vercel ka exact URL add kiya gaya hai
   const baseUrl = "https://jamal-data-hub.vercel.app";
-  const fullUrl = `${baseUrl}/api/number?number=${encodeURIComponent(number)}&key=${encodeURIComponent(key)}`;
+  
+  // FIX: URL parameter order changed to ?key=...&number=...
+  const fullUrl = `${baseUrl}/api/number?key=${encodeURIComponent(key)}&number=${encodeURIComponent(number)}`;
 
   document.getElementById('outKey').textContent = key;
   document.getElementById('outUrl').textContent = fullUrl;
