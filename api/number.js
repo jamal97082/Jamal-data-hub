@@ -1,5 +1,5 @@
 export default async function handler(req, res) {
-  // CORS Headers (Frontend se connect hone ke liye)
+  // CORS Headers (Frontend se bina error connect karne ke liye)
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
@@ -8,39 +8,38 @@ export default async function handler(req, res) {
     return res.status(204).end();
   }
 
-  const { number } = req.query;
+  // Yahan req.query se dono chizein nikal rahe hain
   const key = req.query.key || req.query.slug || null;
+  const number = req.query.number || null;
 
-  if (!number) {
-    return res.status(400).json({
-      status: "error",
-      message: "Number parameter is required",
-      developer: "jamalhacks",
-      contact: "+919708256311",
-      telegram: "https://t.me/rginvester"
-    });
-  }
-
+  // 1. Agar Key nahi di gayi
   if (!key) {
     return res.status(401).json({
       status: "error",
       message: "API Key is required",
       developer: "jamalhacks",
-      contact: "+919708256311",
-      telegram: "https://t.me/rginvester"
+      contact: "+919708256311"
+    });
+  }
+
+  // 2. Agar Number nahi diya gaya
+  if (!number) {
+    return res.status(400).json({
+      status: "error",
+      message: "Number parameter is required",
+      developer: "jamalhacks",
+      contact: "+919708256311"
     });
   }
 
   const keyLower = key.toLowerCase();
 
   // ==========================================
-  // 1. MASTER KEY & EXPIRY SYSTEM
+  // MASTER KEY & EXPIRY SYSTEM
   // ==========================================
   
-  // Agar API key sirf 'jamal' hai, to bina kisi rok-tok ke allow karo (Master Key)
   if (keyLower !== 'jamal') {
-    
-    // Agar Master Key nahi hai, to format check karo (jamal- se start hona chahiye)
+    // Agar Master Key nahi hai, toh check karo start mein 'jamal-' hai ya nahi
     if (!keyLower.startsWith('jamal-')) {
       return res.status(401).json({
         status: "error",
@@ -49,14 +48,13 @@ export default async function handler(req, res) {
       });
     }
 
-    // Key format split karo (e.g., jamal-D2-1730000000000)
+    // Key ko check karo, e.g., jamal-D2-1730000000000
     const parts = keyLower.split('-');
-    const expiryPart = parts[parts.length - 1]; // Last wala part pakdo (timestamp)
+    const expiryPart = parts[parts.length - 1]; // Timestamp nikal rahe hain
 
     if (expiryPart !== "permanent") {
       const expiryTime = parseInt(expiryPart, 10);
       
-      // Agar time ki jagah kuch aur likha hai
       if (isNaN(expiryTime)) {
         return res.status(401).json({
           status: "error",
@@ -65,21 +63,20 @@ export default async function handler(req, res) {
         });
       }
 
-      // ⏳ EXPIRY CHECK: Agar aaj ka time key ke time se aage nikal gaya hai
+      // Agar time expire ho chuka hai
       if (Date.now() > expiryTime) {
         return res.status(403).json({
           status: "error",
           message: "Key Expired! Please contact Admin to renew.",
           developer: "jamalhacks",
-          contact: "+919708256311",
-          telegram: "https://t.me/rginvester"
+          contact: "+919708256311"
         });
       }
     }
   }
 
   // ==========================================
-  // 2. DATA FETCHING SYSTEM
+  // UPSTREAM DATA FETCHING
   // ==========================================
   try {
     const upstream = await fetch(
@@ -95,7 +92,6 @@ export default async function handler(req, res) {
       let address = d.address || d.ADDRESS || '';
       let father = d.fatherName || d.father_name || d.FATHER_NAME || '';
 
-      // Agar father name nahi hai to address se nikalne ka try karo
       if (!father || father === 'N/A' || father === '') {
         const soMatch = address.match(/(?:S\/O|C\/O|W\/O)\s+([^,]+)/i);
         if (soMatch && soMatch[1]) {
@@ -116,6 +112,32 @@ export default async function handler(req, res) {
       if (address) cleanDataObject["🏠 Address"] = address;
     }
 
-    // Aapke terminal UI ke liye styling format
+    // Terminal jaisa green text layout banane ke liye
     let bot_format = "[+] TARGET DATA ACQUIRED [+]\n";
     bot_format += "----------------------------\n";
+    if (Object.keys(cleanDataObject).length > 1) {
+      for (const [k, v] of Object.entries(cleanDataObject)) {
+          bot_format += `${k.padEnd(16)}: ${v}\n`;
+      }
+    } else {
+      bot_format += "No data found for this number.\n";
+    }
+    bot_format += "----------------------------";
+
+    return res.status(200).json({
+      status: data.status || "success",
+      data: cleanDataObject,
+      bot_format: bot_format,
+      developer: "jamalhacks",
+      contact: "+919708256311",
+      telegram: "https://t.me/rginvester"
+    });
+    
+  } catch (err) {
+    return res.status(500).json({
+      status: "error",
+      message: "Upstream API server failed or is down",
+      developer: "jamalhacks"
+    });
+  }
+}
